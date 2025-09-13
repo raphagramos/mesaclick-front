@@ -23,7 +23,7 @@ export const usePedidos = create<PedidoState>((set, get) => ({
     }
 
     const res = await fetch(
-      `http://18.222.146.1:8080/pedidos?restauranteId=${restauranteId}`
+      `https://mesaclick.shop/pedidos?restauranteId=${restauranteId}`
     );
 
     if (!res.ok) {
@@ -49,7 +49,7 @@ export const usePedidos = create<PedidoState>((set, get) => ({
       JSON.stringify(payload, null, 2)
     );
 
-    const res = await fetch("http://18.222.146.1:8080/pedidos", {
+    const res = await fetch("https://mesaclick.shop/pedidos", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
@@ -72,7 +72,7 @@ export const usePedidos = create<PedidoState>((set, get) => ({
 
     const payload = { status, restauranteId };
 
-    const res = await fetch(`http://18.222.146.1:8080/pedidos/${id}/status`, {
+    const res = await fetch(`https://mesaclick.shop/pedidos/${id}/status`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
@@ -93,7 +93,7 @@ export const usePedidos = create<PedidoState>((set, get) => ({
     if (!restauranteId) throw new Error("Restaurante não definido");
 
     const res = await fetch(
-      `http://18.222.146.1:8080/pedidos/${id}?restauranteId=${restauranteId}`,
+      `https://mesaclick.shop/pedidos/${id}?restauranteId=${restauranteId}`,
       { method: "DELETE" }
     );
 

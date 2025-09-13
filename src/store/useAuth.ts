@@ -17,7 +17,7 @@ export const useAuth = create<AuthState>((set) => ({
   nome: null,
 
   login: async (email, senha) => {
-    const res = await fetch("http://18.222.146.1:8080/auth/login", {
+    const res = await fetch("https://mesaclick.shop/auth/login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email, senha }),
@@ -31,7 +31,7 @@ export const useAuth = create<AuthState>((set) => ({
   },
 
   register: async (nome, email, senha) => {
-    const res = await fetch("http://18.222.146.1:8080/auth/register", {
+    const res = await fetch("https://mesaclick.shop/auth/register", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ nome, email, senha }),

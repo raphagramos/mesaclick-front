@@ -18,7 +18,7 @@ export const useLanches = create<LancheState>((set, get) => ({
     const { restauranteId } = useAuth.getState();
     if (!restauranteId) return;
 
-    const res = await fetch(`http://18.222.146.1:8080/lanches?restauranteId=${restauranteId}`);
+    const res = await fetch(`https://mesaclick.shop/lanches?restauranteId=${restauranteId}`);
     const data: Lanche[] = await res.json();
     set({ lanches: data });
   },
@@ -28,7 +28,7 @@ export const useLanches = create<LancheState>((set, get) => ({
     if (!restauranteId) throw new Error("Restaurante não definido");
 
     const lancheParaEnviar = { nome, ingredientes, restauranteId };
-    const res = await fetch("http://18.222.146.1:8080/lanches", {
+    const res = await fetch("https://mesaclick.shop/lanches", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(lancheParaEnviar),
@@ -43,7 +43,7 @@ export const useLanches = create<LancheState>((set, get) => ({
     const { restauranteId } = useAuth.getState();
     if (!restauranteId) throw new Error("Restaurante não definido");
 
-    await fetch(`http://18.222.146.1:8080/lanches/${id}?restauranteId=${restauranteId}`, { method: "DELETE" });
+    await fetch(`https://mesaclick.shop/lanches/${id}?restauranteId=${restauranteId}`, { method: "DELETE" });
     set({ lanches: get().lanches.filter((l) => l.id !== id) });
   },
 
@@ -55,7 +55,7 @@ export const useLanches = create<LancheState>((set, get) => ({
     if (!lancheExistente) return;
 
     const dadosParaAtualizar = { ...lancheExistente, ingredientes, restauranteId };
-    const res = await fetch(`http://18.222.146.1:8080/lanches/${lancheId}`, {
+    const res = await fetch(`https://mesaclick.shop/lanches/${lancheId}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(dadosParaAtualizar),
