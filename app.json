@@ -1,16 +1,16 @@
 {
   "expo": {
-    "name": "garcom",
-    "slug": "garcom",
+    "name": "Mesa Click",
+    "slug": "mesa-click",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
-    "userInterfaceStyle": "light",
+    "userInterfaceStyle": "dark",
     "newArchEnabled": true,
     "splash": {
       "image": "./assets/splash-icon.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#F57C00"
     },
     "ios": {
       "supportsTablet": true
@@ -18,10 +18,10 @@
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
+        "backgroundColor": "#F57C00"
       },
       "edgeToEdgeEnabled": true,
-      "package": "com.raphagramos.garcom"
+      "package": "com.raphagramos.mesa-click"
     },
     "web": {
       "favicon": "./assets/favicon.png"

@@ -19,6 +19,7 @@ export type Lanche = {
 export type PedidoInput = {
   mesa: string;
   note: string;
+  restauranteId:number;
   lanches: {
     lancheId: number;     // objeto, não mais lancheId
     ingredients: string[];     // nomes dos removidos
@@ -36,7 +37,7 @@ export type Pedido = PedidoInput & {
 export type RootStackParamList = {
   Home: undefined;
   Lanches: undefined;
-  RegisterRestaurant: undefined;
+  Registro: undefined;
   Login: undefined;
   CadastroLanche: { comIngredientes: boolean };
   ProductLists: undefined;

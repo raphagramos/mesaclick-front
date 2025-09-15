@@ -22,23 +22,54 @@ export default function AppNavigator() {
 
   return (
     <NavigationContainer>
-      <Header title={""}/>
-      <Stack.Navigator screenOptions={{ headerShown: false }}>
+      <Stack.Navigator >
         {restauranteId ? (
           <>
-            <Stack.Screen name="Home" component={HomeScreen} />
-            <Stack.Screen name="Lanches" component={LancheListScreen} />
-            <Stack.Screen name="CadastroLanche" component={CadastroLancheScreen} />
-            <Stack.Screen name="ProductLists" component={ProductList} />
-            <Stack.Screen name="New" component={CadastroPedidoScreen} />
-            <Stack.Screen name="Pedido" component={PedidoScreen} />
-            <Stack.Screen name="PedidoCustom" component={PedidoCustomScreen} />
-            <Stack.Screen name="ConsultarPedidos" component={ConsultarPedidosScreen} />
+            <Stack.Screen
+              name="Home"
+              component={HomeScreen}
+              options={{ header: () => <Header title="Home" /> }}
+            />
+            <Stack.Screen
+              name="Lanches"
+              component={LancheListScreen}
+              options={{ header: () => <Header title="Lanches" /> }}
+            />
+            <Stack.Screen
+              name="CadastroLanche"
+              component={CadastroLancheScreen}
+              options={{ header: () => <Header title="Cadastro Lanche" /> }}
+            />
+            <Stack.Screen
+              name="ProductLists"
+              component={ProductList}
+              options={{ header: () => <Header title="Produtos" /> }}
+            />
+            <Stack.Screen
+              name="New"
+              component={CadastroPedidoScreen}
+              options={{ header: () => <Header title="Novo Pedido" /> }}
+            />
+            <Stack.Screen
+              name="Pedido"
+              component={PedidoScreen}
+              options={{ header: () => <Header title="Pedido" /> }}
+            />
+            <Stack.Screen
+              name="PedidoCustom"
+              component={PedidoCustomScreen}
+              options={{ header: () => <Header title="Pedido Custom" /> }}
+            />
+            <Stack.Screen
+              name="ConsultarPedidos"
+              component={ConsultarPedidosScreen}
+              options={{ header: () => <Header title="Consultar Pedidos" /> }}
+            />
           </>
         ) : (
           <>
             <Stack.Screen name="Login" component={LoginScreen} />
-            <Stack.Screen name="RegisterRestaurant" component={RegisterScreen} />
+            <Stack.Screen name="Registro" component={RegisterScreen} />
           </>
         )}
       </Stack.Navigator>

@@ -1,5 +1,6 @@
 import React, { useEffect } from "react";
 import styled, { ThemeProvider } from "styled-components/native";
+import { Image } from "react-native";
 import Button from "../components/Button";
 import { theme } from "../styles/theme";
 import AddIcon from "../../assets/cadastro.svg";
@@ -12,25 +13,33 @@ import { usePedidos } from "../store/usePedidos";
 import { useLanches } from "../store/useLanches";
 
 const Container = styled.SafeAreaView`
-  display: flex;
-  align-items: center;
   flex: 1;
-  background-color: ${(props) => props.theme.colors.background};
+  background-color: ${({ theme }) => theme.colors.background};
   padding: 20px;
 `;
 
+const Header = styled.View`
+  align-items: center;
+  margin-bottom: 24px;
+`;
+
+const AppLogo = styled(Image)`
+  width: 72px;
+  height: 72px;
+  margin-bottom: 8px;
+`;
+
 const Title = styled.Text`
-  font-size: 28px;
+  font-size: 26px;
   font-weight: 800;
   color: ${({ theme }) => theme.colors.text};
-  margin-bottom: 8px;
 `;
 
 const Grid = styled.View`
   flex-direction: row;
-  flex-wrap: wrap; 
+  flex-wrap: wrap;
   justify-content: space-between;
-  margin: 16px;
+  margin-top: 12px;
 `;
 
 type Props = NativeStackScreenProps<RootStackParamList, "Home">;
@@ -41,18 +50,20 @@ export default function HomeScreen({ navigation }: Props) {
 
   useEffect(() => {
     const unsubscribe = navigation.addListener("focus", () => {
-      console.log("[HomeScreen] Tela focada, atualizando pedidos e lanches...");
       fetchPedidos().catch(err => console.error("Erro fetchPedidos:", err));
       fetchLanches().catch(err => console.error("Erro fetchLanches:", err));
     });
-
     return unsubscribe;
   }, [navigation, fetchPedidos, fetchLanches]);
 
   return (
     <ThemeProvider theme={theme}>
       <Container>
-        <Title>Mesa Click</Title>
+        <Header>
+          <AppLogo source={require("../../assets/IconLogin.png")} />
+          <Title>Mesa Click</Title>
+        </Header>
+
         <Grid>
           <Button
             title="Cadastro"

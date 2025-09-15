@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { useAuth } from "./useAuth";
 import { Lanche } from "../../types";
+import { API_URL } from '@env';
 
 type LancheState = {
   lanches: Lanche[];
@@ -18,7 +19,7 @@ export const useLanches = create<LancheState>((set, get) => ({
     const { restauranteId } = useAuth.getState();
     if (!restauranteId) return;
 
-    const res = await fetch(`https://mesaclick.shop/lanches?restauranteId=${restauranteId}`);
+    const res = await fetch(`${API_URL}/lanches?restauranteId=${restauranteId}`);
     const data: Lanche[] = await res.json();
     set({ lanches: data });
   },
@@ -28,7 +29,8 @@ export const useLanches = create<LancheState>((set, get) => ({
     if (!restauranteId) throw new Error("Restaurante não definido");
 
     const lancheParaEnviar = { nome, ingredientes, restauranteId };
-    const res = await fetch("https://mesaclick.shop/lanches", {
+    console.log("[Auth] cadastro iniciado:",`${API_URL}`);
+    const res = await fetch(`${API_URL}/lanches`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(lancheParaEnviar),
@@ -43,7 +45,7 @@ export const useLanches = create<LancheState>((set, get) => ({
     const { restauranteId } = useAuth.getState();
     if (!restauranteId) throw new Error("Restaurante não definido");
 
-    await fetch(`https://mesaclick.shop/lanches/${id}?restauranteId=${restauranteId}`, { method: "DELETE" });
+    await fetch(`${API_URL}/lanches/${id}?restauranteId=${restauranteId}`, { method: "DELETE" });
     set({ lanches: get().lanches.filter((l) => l.id !== id) });
   },
 
@@ -55,7 +57,7 @@ export const useLanches = create<LancheState>((set, get) => ({
     if (!lancheExistente) return;
 
     const dadosParaAtualizar = { ...lancheExistente, ingredientes, restauranteId };
-    const res = await fetch(`https://mesaclick.shop/lanches/${lancheId}`, {
+    const res = await fetch(`${API_URL}/lanches/${lancheId}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(dadosParaAtualizar),

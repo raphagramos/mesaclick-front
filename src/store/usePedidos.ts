@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { useAuth } from "./useAuth";
 import { Pedido, PedidoInput } from "../../types";
+import { API_URL } from '@env';
 
 type PedidoState = {
   pedidos: Pedido[];
@@ -16,23 +17,14 @@ export const usePedidos = create<PedidoState>((set, get) => ({
   fetchPedidos: async () => {
     const { restauranteId } = useAuth.getState();
     if (!restauranteId) {
-      console.warn(
-        "Restaurante não definido, não será possível buscar pedidos."
-      );
+      console.warn("Restaurante não definido, não será possível buscar pedidos.");
       return;
     }
 
-    const res = await fetch(
-      `https://mesaclick.shop/pedidos?restauranteId=${restauranteId}`
-    );
-
-    if (!res.ok) {
-      throw new Error("Falha ao buscar pedidos");
-    }
+    const res = await fetch(`${API_URL}/pedidos?restauranteId=${restauranteId}`);
+    if (!res.ok) throw new Error("Falha ao buscar pedidos");
 
     const data: Pedido[] = await res.json();
-
-    // 🔹 Agora não precisa filtrar no frontend, backend já retorna apenas os do restaurante
     set({ pedidos: data });
   },
 
@@ -40,16 +32,10 @@ export const usePedidos = create<PedidoState>((set, get) => ({
     const { restauranteId } = useAuth.getState();
     if (!restauranteId) throw new Error("Restaurante não definido");
 
-    // Inclui restauranteId no payload
     const payload = { ...p, restauranteId };
-
-    // Log do payload enviado
-    console.log(
-      "Enviando pedido para o backend:",
-      JSON.stringify(payload, null, 2)
-    );
-
-    const res = await fetch("https://mesaclick.shop/pedidos", {
+    console.log("Enviando pedido para o backend:", JSON.stringify(payload, null, 2));
+    console.log("pedido iniciado:",`${API_URL}`);
+    const res = await fetch(`${API_URL}/pedidos`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
@@ -71,8 +57,7 @@ export const usePedidos = create<PedidoState>((set, get) => ({
     if (!restauranteId) throw new Error("Restaurante não definido");
 
     const payload = { status, restauranteId };
-
-    const res = await fetch(`https://mesaclick.shop/pedidos/${id}/status`, {
+    const res = await fetch(`${API_URL}/pedidos/${id}/status`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
@@ -92,11 +77,7 @@ export const usePedidos = create<PedidoState>((set, get) => ({
     const { restauranteId } = useAuth.getState();
     if (!restauranteId) throw new Error("Restaurante não definido");
 
-    const res = await fetch(
-      `https://mesaclick.shop/pedidos/${id}?restauranteId=${restauranteId}`,
-      { method: "DELETE" }
-    );
-
+    const res = await fetch(`${API_URL}/pedidos/${id}?restauranteId=${restauranteId}`, { method: "DELETE" });
     if (!res.ok) {
       const errorText = await res.text();
       console.error("Erro ao deletar pedido:", errorText);
