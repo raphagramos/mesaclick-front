@@ -16,10 +16,7 @@
       "supportsTablet": true
     },
     "android": {
-      "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#F57C00"
-      },
+      "icon": "./assets/icon.png",
       "edgeToEdgeEnabled": true,
       "package": "com.raphagramos.mesa-click"
     },

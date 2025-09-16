@@ -25,18 +25,38 @@ type Props = NativeStackScreenProps<RootStackParamList, "CadastroLanche">;
 export default function CadastroLancheScreen({ navigation, route }: Props) {
   const { comIngredientes } = route.params;
   const { addLanche } = useLanches();
-  const { restauranteId } = useAuth(); // pegar restauranteId do login
+  const { restauranteId } = useAuth();
 
   const [nome, setNome] = useState<string>("");
   const [ingredientes, setIngredientes] = useState<string>("");
+  const [valor, setValor] = useState<string>("");
+
+  function formatCurrency(value: number) {
+    return value.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+  }
+
+  function handleValorChange(text: string) {
+    const clean = text.replace(/\D/g, ""); // remove tudo que não é número
+    const numberValue = Number(clean) / 100;
+    setValor(formatCurrency(numberValue));
+  }
 
   async function salvar() {
     if (!restauranteId) {
-      return Alert.alert("Erro", "Restaurante não definido. Faça login novamente.");
+      return Alert.alert(
+        "Erro",
+        "Restaurante não definido. Faça login novamente."
+      );
     }
 
     if (!nome.trim()) {
       return Alert.alert("Erro", "Informe o nome do item.");
+    }
+
+    // Converte valor formatado para número
+    const valorNum = Number(valor.replace(/[^0-9,-]+/g, "").replace(",", "."));
+    if (!valor.trim() || isNaN(valorNum) || valorNum <= 0) {
+      return Alert.alert("Erro", "Informe um valor válido.");
     }
 
     const ingList = comIngredientes
@@ -51,7 +71,7 @@ export default function CadastroLancheScreen({ navigation, route }: Props) {
     }
 
     try {
-      await addLanche(nome.trim(), ingList);
+      await addLanche(nome.trim(), valorNum, ingList);
       Alert.alert("Sucesso", "Item cadastrado!");
       navigation.navigate("Lanches");
     } catch (err) {
@@ -82,12 +102,21 @@ export default function CadastroLancheScreen({ navigation, route }: Props) {
           </>
         )}
 
+        <Label>Valor (R$)</Label>
+        <Input
+          placeholder="0,00"
+          placeholderTextColor={theme.colors.subtle}
+          value={valor}
+          onChangeText={handleValorChange}
+          keyboardType="numeric"
+        />
+
         <View style={{ marginTop: 16 }}>
           <Button
             title="Salvar"
             variant="success"
             onPress={salvar}
-            disabled={!restauranteId} // só habilita se tiver restauranteId
+            disabled={!restauranteId}
           />
         </View>
       </Container>

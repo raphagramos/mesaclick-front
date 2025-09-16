@@ -4,7 +4,7 @@ import { useNavigation } from "@react-navigation/native";
 import styled from "styled-components/native";
 import { Ionicons } from "@expo/vector-icons";
 import { Alert } from "react-native";
-import { useAuth } from "../store/useAuth"; // seu hook de auth
+import { useAuth } from "../store/useAuth";
 
 const Container = styled.View`
   flex-direction: row;
@@ -19,20 +19,26 @@ const Title = styled.Text`
   font-size: 20px;
   font-weight: bold;
   color: ${({ theme }) => theme.colors.text};
+  flex: 1;
+  text-align: center;
+`;
+
+const LeftButton = styled.View`
+  width: 40px;
+  align-items: flex-start;
 `;
 
 const RightButtons = styled.View`
   flex-direction: row;
   align-items: center;
-  gap: 12px; /* espaçamento entre ícones */
+  gap: 12px;
 `;
 
 type Props = {
   title: string;
-  showBack?: boolean;
 };
 
-export default function Header({ title, showBack = true }: Props) {
+export default function Header({ title }: Props) {
   const navigation = useNavigation();
   const { logout } = useAuth();
 
@@ -49,26 +55,18 @@ export default function Header({ title, showBack = true }: Props) {
 
   return (
     <Container>
-      {showBack ? (
-        <Ionicons
-          name="arrow-back"
-          size={24}
-          color="black"
-          onPress={() => navigation.goBack()}
-        />
-      ) : (
-        <Ionicons name="arrow-back" size={24} color="transparent" />
-      )}
-
-      <Title>{title}</Title>
-
-      <RightButtons>
+      <LeftButton>
         <Ionicons
           name="home"
           size={24}
           color="black"
           onPress={() => navigation.navigate("Home" as never)}
         />
+      </LeftButton>
+
+      <Title>{title}</Title>
+
+      <RightButtons>
         <Ionicons
           name="log-out-outline"
           size={24}

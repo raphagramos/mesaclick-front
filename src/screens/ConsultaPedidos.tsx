@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React from "react";
 import styled, { ThemeProvider } from "styled-components/native";
 import { FlatList, TouchableOpacity } from "react-native";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
@@ -15,30 +15,47 @@ const Container = styled.SafeAreaView`
 `;
 
 const Title = styled.Text`
-  font-size: 24px;
-  font-weight: 800;
+  font-size: 26px;
+  font-weight: 900;
   color: ${({ theme }) => theme.colors.text};
   margin-bottom: 16px;
+`;
+const RemovedText = styled.Text`
+  font-style: italic;
+  color: #888;
+  font-weight: 400;
 `;
 
 const PedidoCard = styled.View`
   background-color: ${({ theme }) => theme.colors.card};
-  padding: 16px;
-  border-radius: 12px;
-  margin-bottom: 12px;
+  padding: 20px;
+  border-radius: 16px;
+  margin-bottom: 16px;
   elevation: 3;
+  shadow-color: #000;
+  shadow-opacity: 0.1;
+  shadow-radius: 8px;
+  shadow-offset: 0px 4px;
 `;
 
 const PedidoHeader = styled.Text`
   font-weight: 700;
   font-size: 18px;
-  margin-bottom: 8px;
   color: ${({ theme }) => theme.colors.text};
+  margin-bottom: 4px;
+`;
+
+const PedidoValor = styled.Text`
+  font-weight: 800;
+  font-size: 18px;
+  color: #007acc;
+  margin-bottom: 12px;
 `;
 
 const LancheText = styled.Text`
   font-size: 16px;
-  margin-left: 8px;
+  margin-left: 12px;
+  margin-bottom: 4px;
   color: ${({ theme }) => theme.colors.text};
 `;
 
@@ -51,12 +68,11 @@ const NoteText = styled.Text`
 const StatusRow = styled.View`
   flex-direction: row;
   align-items: center;
-  margin-bottom: 8px;
+  margin-bottom: 12px;
 `;
 
 const StatusButton = styled(TouchableOpacity)<{ status: string }>`
-  align-self: flex-start;
-  padding: 6px 12px;
+  padding: 6px 14px;
   border-radius: 20px;
   background-color: ${({ status }) =>
     status === "novo"
@@ -81,7 +97,7 @@ export default function ConsultarPedidosScreen({ navigation }: Props) {
   const { restauranteId } = useAuth();
 
   const toggleStatus = async (pedido: Pedido) => {
-    if (!restauranteId) return; // evita ações sem restaurante definido
+    if (!restauranteId) return;
 
     const novoStatus =
       pedido.status === "novo"
@@ -112,7 +128,6 @@ export default function ConsultarPedidosScreen({ navigation }: Props) {
       const l: Lanche | undefined = getById(lancheId);
       if (!l) return null;
 
-      // Ingredientes incluídos (não removidos)
       const includedIngredients = l.ingredientes.filter(
         (nome) => !(ingredients ?? []).includes(nome)
       );
@@ -120,12 +135,25 @@ export default function ConsultarPedidosScreen({ navigation }: Props) {
       return (
         <LancheText key={lancheId}>
           • {l.nome}
-          {includedIngredients.length > 0
-            ? ` (Ingredientes: ${includedIngredients.join(", ")})`
-            : ""}
+          {includedIngredients.length > 0 && (
+            <>
+              {" "}
+              <RemovedText style={{ fontStyle: "italic", color: "#888" }}>
+                (Sem {includedIngredients.join(", ")})
+              </RemovedText>
+            </>
+          )}
         </LancheText>
       );
     });
+
+  const formatValor = (valor: number | undefined) =>
+    valor
+      ? Intl.NumberFormat("pt-BR", {
+          style: "currency",
+          currency: "BRL",
+        }).format(valor)
+      : "R$ 0,00";
 
   return (
     <ThemeProvider theme={theme}>
@@ -160,9 +188,11 @@ export default function ConsultarPedidosScreen({ navigation }: Props) {
                 Pedido #{item.id} - Mesa {item.mesa}
               </PedidoHeader>
 
+              <PedidoValor>{formatValor(item.valorTotal)}</PedidoValor>
+
               {renderLanches(item)}
 
-              {item.note ? <NoteText>Obs: {item.note}</NoteText> : null}
+              {item.note && <NoteText>Obs: {item.note}</NoteText>}
             </PedidoCard>
           )}
           contentContainerStyle={{ paddingBottom: 16 }}

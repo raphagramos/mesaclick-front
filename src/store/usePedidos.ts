@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { useAuth } from "./useAuth";
 import { Pedido, PedidoInput } from "../../types";
-import { API_URL } from '@env';
+import { API_URL } from "@env";
 
 type PedidoState = {
   pedidos: Pedido[];
@@ -17,24 +17,30 @@ export const usePedidos = create<PedidoState>((set, get) => ({
   fetchPedidos: async () => {
     const { restauranteId } = useAuth.getState();
     if (!restauranteId) {
-      console.warn("Restaurante não definido, não será possível buscar pedidos.");
+      console.warn(
+        "Restaurante não definido, não será possível buscar pedidos."
+      );
       return;
     }
 
-    const res = await fetch(`${API_URL}/pedidos?restauranteId=${restauranteId}`);
+    const res = await fetch(
+      `${API_URL}/pedidos?restauranteId=${restauranteId}`
+    );
     if (!res.ok) throw new Error("Falha ao buscar pedidos");
 
     const data: Pedido[] = await res.json();
     set({ pedidos: data });
   },
 
-  addPedido: async (p: PedidoInput) => {
+  addPedido: async (p: PedidoInput & { valorTotal?: number }) => {
     const { restauranteId } = useAuth.getState();
     if (!restauranteId) throw new Error("Restaurante não definido");
 
     const payload = { ...p, restauranteId };
-    console.log("Enviando pedido para o backend:", JSON.stringify(payload, null, 2));
-    console.log("pedido iniciado:",`${API_URL}`);
+    console.log(
+      "Enviando pedido para o backend:",
+      JSON.stringify(payload, null, 2)
+    );
     const res = await fetch(`${API_URL}/pedidos`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -77,7 +83,10 @@ export const usePedidos = create<PedidoState>((set, get) => ({
     const { restauranteId } = useAuth.getState();
     if (!restauranteId) throw new Error("Restaurante não definido");
 
-    const res = await fetch(`${API_URL}/pedidos/${id}?restauranteId=${restauranteId}`, { method: "DELETE" });
+    const res = await fetch(
+      `${API_URL}/pedidos/${id}?restauranteId=${restauranteId}`,
+      { method: "DELETE" }
+    );
     if (!res.ok) {
       const errorText = await res.text();
       console.error("Erro ao deletar pedido:", errorText);

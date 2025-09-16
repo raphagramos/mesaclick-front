@@ -1,8 +1,7 @@
 export type Ingredient = {
-  id: number;  
-  name: string; 
+  id: number;
+  name: string;
 };
-
 
 export type IngredientSelection = Ingredient & {
   selected: boolean;
@@ -12,25 +11,27 @@ export type IngredientSelection = Ingredient & {
 export type Lanche = {
   id: number;
   nome: string;
-  ingredientes: string[]; 
+  ingredientes: string[];
+  valor:number;
 };
 
 // Pedido (input e retorno do backend)
 export type PedidoInput = {
   mesa: string;
   note: string;
-  restauranteId:number;
+  restauranteId: number;
   lanches: {
-    lancheId: number;     // objeto, não mais lancheId
-    ingredients: string[];     // nomes dos removidos
+    lancheId: number; // objeto, não mais lancheId
+    ingredients: string[]; // nomes dos removidos
   }[];
+  valorTotal:number;
 };
 
 export type Pedido = PedidoInput & {
   id: number;
   status: string;
-  createdAt: string;            // ISO string vinda do backend
-  restauranteId:number;
+  createdAt: string; // ISO string vinda do backend
+  restauranteId: number;
 };
 
 // Navegação

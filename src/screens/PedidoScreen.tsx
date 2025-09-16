@@ -79,6 +79,9 @@ function PedidoScreen({ route, navigation }: Props) {
     );
   }
 
+  // valor total do pedido (somente 1 lanche por enquanto)
+  const valorTotal = lanche.valor ?? 0;
+
   async function salvar() {
     if (!mesa.trim()) {
       Alert.alert("Atenção", "Informe o número da mesa.");
@@ -95,6 +98,7 @@ function PedidoScreen({ route, navigation }: Props) {
         note,
         restauranteId,
         lanches: [{ lancheId: lanche!.id, ingredients: excludedNames }],
+        valorTotal, // envia o valor total
       });
 
       Alert.alert("Pedido salvo", `Pedido #${orderId} criado.`);
@@ -111,7 +115,7 @@ function PedidoScreen({ route, navigation }: Props) {
         style={{ flex: 1 }}
         contentContainerStyle={{ flexGrow: 1 }}
         enableOnAndroid
-        extraScrollHeight={80} // dá um respiro extra quando o teclado abre
+        extraScrollHeight={80}
       >
         <Container>
           <Header>
@@ -148,6 +152,10 @@ function PedidoScreen({ route, navigation }: Props) {
             onChangeText={setNote}
             placeholderTextColor={theme.colors.subtle}
           />
+
+          <Subtle>
+            Valor do pedido: {valorTotal.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}
+          </Subtle>
 
           {excludedNames.length > 0 ? (
             <Subtle>Sem: {excludedNames.join(", ")}</Subtle>

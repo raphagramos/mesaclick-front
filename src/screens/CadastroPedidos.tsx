@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import styled, { ThemeProvider } from "styled-components/native";
-import { Alert, FlatList, TouchableOpacity } from "react-native";
+import { Alert, FlatList } from "react-native";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParamList, Lanche, PedidoInput } from "../../types";
 import { theme } from "../styles/theme";
@@ -29,6 +29,13 @@ const Subtle = styled.Text`
   margin-bottom: 8px;
 `;
 
+const TotalText = styled.Text`
+  font-size: 18px;
+  font-weight: 700;
+  color: ${({ theme }) => theme.colors.text};
+  margin-vertical: 12px;
+`;
+
 type Props = NativeStackScreenProps<RootStackParamList, "New">;
 
 export default function CadastroPedidoScreen({ navigation }: Props) {
@@ -49,7 +56,29 @@ export default function CadastroPedidoScreen({ navigation }: Props) {
     setSelectedIds((prev) =>
       prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
     );
+
+    const lanche = lanches.find((l) => l.id === id);
+    if (lanche?.ingredientes?.length) {
+      navigation.navigate("PedidoCustom", {
+        lancheId: id,
+        selectedIngredients: customIngredients[id],
+        mode: "pedido",
+        onReturn: (selectedNames: string[]) => {
+          setCustomIngredients((prev) => ({
+            ...prev,
+            [id]: selectedNames,
+          }));
+        },
+      });
+    }
   }
+
+  const valorTotal = useMemo(() => {
+    return selectedIds.reduce((total, id) => {
+      const lanche = lanches.find((l) => l.id === id);
+      return total + (lanche?.valor ?? 0);
+    }, 0);
+  }, [selectedIds, lanches]);
 
   async function salvarPedido() {
     if (!restauranteId) {
@@ -78,11 +107,12 @@ export default function CadastroPedidoScreen({ navigation }: Props) {
     });
 
     try {
-      const payload: PedidoInput = {
+      const payload: PedidoInput & { valorTotal: number } = {
         mesa: mesa.trim(),
         note,
         lanches: lanchesDoPedido,
-        restauranteId, // ⚡ inclui restauranteId aqui
+        restauranteId,
+        valorTotal,
       };
 
       const orderId = await addPedido(payload);
@@ -107,35 +137,19 @@ export default function CadastroPedidoScreen({ navigation }: Props) {
         <FlatList
           data={lanches}
           keyExtractor={(item: Lanche) => item.id.toString()}
-          renderItem={({ item }) => {
-            const pressAction = () => {
-              toggleLanche(item.id);
-
-              if (item.ingredientes?.length) {
-                navigation.navigate("PedidoCustom", {
-                  lancheId: item.id,
-                  selectedIngredients: customIngredients[item.id],
-                  mode: "pedido",
-                  onReturn: (selectedNames: string[]) => {
-                    setCustomIngredients((prev) => ({
-                      ...prev,
-                      [item.id]: selectedNames,
-                    }));
-                  },
-                });
-              }
-            };
-
-            return (
-              <Checkbox
-                label={item.nome}
-                checked={selectedIds.includes(item.id)}
-                onPress={pressAction}
-              />
-            );
-          }}
+          renderItem={({ item }) => (
+            <Checkbox
+              label={item.nome}
+              checked={selectedIds.includes(item.id)}
+              onPress={() => toggleLanche(item.id)}
+            />
+          )}
           contentContainerStyle={{ paddingBottom: 16 }}
         />
+
+        <TotalText>
+          Valor Total: {valorTotal.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}
+        </TotalText>
 
         <Input
           placeholder="Número da mesa"

@@ -13,14 +13,14 @@ import {
   TouchableOpacity,
 } from "react-native";
 import { useAuth } from "../store/useAuth";
-import { Ionicons } from "@expo/vector-icons"; 
+import { Ionicons } from "@expo/vector-icons";
 
 export default function RegisterScreen() {
   const register = useAuth((state) => state.register);
   const [nome, setNome] = useState("");
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
-  const [secure, setSecure] = useState(true); 
+  const [showSenha, setShowSenha] = useState(false);
 
   const handleRegister = async () => {
     if (!/\S+@\S+\.\S+/.test(email)) {
@@ -29,6 +29,7 @@ export default function RegisterScreen() {
     }
 
     try {
+      Keyboard.dismiss();
       await register(nome, email, senha);
       Alert.alert("Sucesso", "Restaurante registrado com sucesso!");
     } catch (err) {
@@ -37,14 +38,12 @@ export default function RegisterScreen() {
   };
 
   return (
-    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
       <KeyboardAwareScrollView
         contentContainerStyle={styles.container}
         extraScrollHeight={40}
         enableOnAndroid={true}
         keyboardShouldPersistTaps="handled"
-        keyboardDismissMode="on-drag" // 👈 fecha teclado ao puxar pra baixo
-        alwaysBounceVertical={true}   // 👈 força scroll mesmo se o conteúdo for pequeno
       >
         <Image
           source={require("../../assets/IconLogin.png")}
@@ -71,24 +70,25 @@ export default function RegisterScreen() {
           autoCorrect={false}
         />
 
-        {/* Campo de senha com botão de olho */}
-        <View style={styles.passwordWrapper}>
+        {/* Senha com olho igual ao login */}
+        <View style={styles.senhaWrapper}>
           <TextInput
             style={[styles.input, { flex: 1, marginBottom: 0 }]}
             placeholder="Senha"
             placeholderTextColor="#888"
-            secureTextEntry={secure}
+            secureTextEntry={!showSenha}
             value={senha}
             onChangeText={setSenha}
+            autoCapitalize="none"
           />
           <TouchableOpacity
-            onPress={() => setSecure((prev) => !prev)}
+            onPress={() => setShowSenha((prev) => !prev)}
             style={styles.eyeButton}
           >
             <Ionicons
-              name={secure ? "eye-off" : "eye"}
-              size={22}
-              color="#555"
+              name={showSenha ? "eye-off" : "eye"}
+              size={24}
+              color="#888"
             />
           </TouchableOpacity>
         </View>
@@ -120,19 +120,19 @@ const styles = StyleSheet.create({
     marginBottom: 14,
     borderRadius: 8,
     backgroundColor: "#fff",
+    color: "#000",
   },
-  passwordWrapper: {
+  senhaWrapper: {
     width: "100%",
     flexDirection: "row",
     alignItems: "center",
-    borderWidth: 1,
-    borderColor: "#ddd",
-    borderRadius: 8,
-    backgroundColor: "#fff",
     marginBottom: 14,
+    position: "relative",
   },
   eyeButton: {
-    paddingHorizontal: 12,
+    position: "absolute",
+    right: 12,
+    padding: 4,
   },
   buttonWrapper: { width: "100%", marginTop: 8 },
 });

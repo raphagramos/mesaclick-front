@@ -1,14 +1,18 @@
 import { create } from "zustand";
 import { useAuth } from "./useAuth";
 import { Lanche } from "../../types";
-import { API_URL } from '@env';
+import { API_URL } from "@env";
 
 type LancheState = {
   lanches: Lanche[];
   fetchLanches: () => Promise<void>;
-  addLanche: (nome: string, ingredientes: string[]) => Promise<void>;
+  addLanche: (nome: string, valor: number, ingredientes: string[]) => Promise<void>;
   removeLanche: (id: number) => Promise<void>;
-  updateIngredients: (lancheId: number, ingredientes: string[]) => Promise<void>;
+  updateIngredients: (
+    lancheId: number,
+    ingredientes: string[],
+    valor?: number
+  ) => Promise<void>;
   getById: (id: number) => Lanche | undefined;
 };
 
@@ -24,12 +28,14 @@ export const useLanches = create<LancheState>((set, get) => ({
     set({ lanches: data });
   },
 
-  addLanche: async (nome, ingredientes) => {
+  addLanche: async (nome, valor, ingredientes) => {
     const { restauranteId } = useAuth.getState();
     if (!restauranteId) throw new Error("Restaurante não definido");
 
-    const lancheParaEnviar = { nome, ingredientes, restauranteId };
-    console.log("[Auth] cadastro iniciado:",`${API_URL}`);
+    const lancheParaEnviar = { nome, valor, ingredientes, restauranteId };
+    console.log("[Auth] cadastro iniciado:", `${API_URL}`);
+    console.log(JSON.stringify(lancheParaEnviar));
+
     const res = await fetch(`${API_URL}/lanches`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -45,26 +51,38 @@ export const useLanches = create<LancheState>((set, get) => ({
     const { restauranteId } = useAuth.getState();
     if (!restauranteId) throw new Error("Restaurante não definido");
 
-    await fetch(`${API_URL}/lanches/${id}?restauranteId=${restauranteId}`, { method: "DELETE" });
+    await fetch(`${API_URL}/lanches/${id}?restauranteId=${restauranteId}`, {
+      method: "DELETE",
+    });
     set({ lanches: get().lanches.filter((l) => l.id !== id) });
   },
 
-  updateIngredients: async (lancheId, ingredientes) => {
+  updateIngredients: async (lancheId, ingredientes, valor) => {
     const { restauranteId } = useAuth.getState();
     if (!restauranteId) throw new Error("Restaurante não definido");
 
     const lancheExistente = get().lanches.find((l) => l.id === lancheId);
     if (!lancheExistente) return;
 
-    const dadosParaAtualizar = { ...lancheExistente, ingredientes, restauranteId };
+    // Monta payload, adicionando valor somente se existir
+    const dadosParaAtualizar: any = {
+      ...lancheExistente,
+      ingredientes,
+      restauranteId,
+    };
+    if (valor !== undefined) dadosParaAtualizar.valor = valor;
+
     const res = await fetch(`${API_URL}/lanches/${lancheId}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(dadosParaAtualizar),
     });
     const updated: Lanche = await res.json();
-    set({ lanches: get().lanches.map((l) => (l.id === lancheId ? updated : l)) });
+    set({
+      lanches: get().lanches.map((l) => (l.id === lancheId ? updated : l)),
+    });
   },
 
   getById: (id) => get().lanches.find((l) => l.id === id),
 }));
+

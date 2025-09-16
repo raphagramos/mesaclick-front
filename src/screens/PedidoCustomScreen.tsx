@@ -14,9 +14,9 @@ const Container = styled.SafeAreaView`
   background-color: ${({ theme }) => theme.colors.background};
 `;
 
-const Title = styled.Text`
-  font-size: 22px;
-  font-weight: 800;
+const Title = styled.Text<{ size?: number; bold?: boolean }>`
+  font-size: ${({ size }) => size ?? 22}px;
+  font-weight: ${({ bold }) => (bold ? "800" : "normal")};
   color: ${({ theme }) => theme.colors.text};
   margin-bottom: 8px;
 `;
@@ -62,9 +62,13 @@ export default function PedidoCustomScreen({ route, navigation }: Props) {
     [lancheOriginal?.ingredientes]
   );
 
-  const [ingredientes, setIngredientes] =
-    useState<Ingredient[]>(ingredientesComId);
+  const [ingredientes, setIngredientes] = useState<Ingredient[]>(ingredientesComId);
   const [newIngredient, setNewIngredient] = useState("");
+  const [valor, setValor] = useState<string>(
+    lancheOriginal?.valor != null
+      ? formatCurrency(Number(lancheOriginal.valor))
+      : ""
+  );
 
   const [flags, setFlags] = useState<Record<number, boolean>>(
     () =>
@@ -76,6 +80,12 @@ export default function PedidoCustomScreen({ route, navigation }: Props) {
       ) as Record<number, boolean>
   );
 
+  const allowIngredients = mode === "cadastro" && (lancheOriginal?.ingredientes?.length ?? 0) > 0;
+
+  function formatCurrency(value: number) {
+    return value.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+  }
+
   function addIngredient() {
     if (!newIngredient.trim()) return;
     const novos = newIngredient
@@ -83,6 +93,7 @@ export default function PedidoCustomScreen({ route, navigation }: Props) {
       .map((name) => name.trim())
       .filter((name) => name.length > 0)
       .map((name): Ingredient => ({ id: nextId++, name }));
+
     setIngredientes((prev) => [...prev, ...novos]);
     setFlags((prev) => {
       const updated = { ...prev };
@@ -103,14 +114,24 @@ export default function PedidoCustomScreen({ route, navigation }: Props) {
 
   function salvar() {
     const nomes = ingredientes.map((i) => i.name);
-    if (mode === "cadastro" && lancheOriginal)
-      updateIngredients(lancheId, nomes);
+
+    const valorNum = Number(valor.replace(/[^0-9,-]+/g, "").replace(",", "."));
+    if (isNaN(valorNum) || valorNum <= 0) {
+      alert("Informe um valor válido.");
+      return;
+    }
+
+    if (mode === "cadastro" && lancheOriginal) {
+      updateIngredients(lancheId, nomes, valorNum);
+    }
+
     if (onReturn) {
       const selecionados = ingredientes
         .filter((i) => flags[i.id])
         .map((i) => i.name);
       onReturn(selecionados);
     }
+
     navigation.goBack();
   }
 
@@ -118,8 +139,24 @@ export default function PedidoCustomScreen({ route, navigation }: Props) {
     <ThemeProvider theme={theme}>
       <Container>
         <Title>{lancheOriginal?.nome}</Title>
-
-        {mode === "cadastro" && (
+{mode !== "pedido" && (
+  <>
+        <Title size={16} bold style={{ marginBottom: 4 }}>
+          Valor:
+        </Title>
+        <Input
+          placeholder="0,00"
+          placeholderTextColor={theme.colors.subtle}
+          value={valor}
+          onChangeText={(text) => {
+            const clean = text.replace(/\D/g, "");
+            const numberValue = Number(clean) / 100;
+            setValor(formatCurrency(numberValue));
+          }}
+          keyboardType="numeric"
+        />
+</>)}
+        {allowIngredients && (
           <>
             <Input
               placeholder="Adicione múltiplos, separados por ','"
@@ -139,11 +176,7 @@ export default function PedidoCustomScreen({ route, navigation }: Props) {
             <Row>
               {mode === "pedido" ? (
                 <TouchableOpacity
-                  style={{
-                    flexDirection: "row",
-                    alignItems: "center",
-                    flex: 1,
-                  }}
+                  style={{ flexDirection: "row", alignItems: "center", flex: 1 }}
                   onPress={() =>
                     setFlags((prev) => ({ ...prev, [item.id]: !prev[item.id] }))
                   }
@@ -152,20 +185,17 @@ export default function PedidoCustomScreen({ route, navigation }: Props) {
                     label={item.name}
                     checked={flags[item.id] ?? true}
                     onPress={() =>
-                      setFlags((prev) => ({
-                        ...prev,
-                        [item.id]: !(prev[item.id] ?? true),
-                      }))
+                      setFlags((prev) => ({ ...prev, [item.id]: !(prev[item.id] ?? true) }))
                     }
                   />
                 </TouchableOpacity>
               ) : (
-                <Title style={{ fontSize: 16, fontWeight: "normal" }}>
+                <Title size={16} style={{ fontWeight: "normal" }}>
                   {item.name}
                 </Title>
               )}
 
-              {mode === "cadastro" && (
+              {allowIngredients && (
                 <TouchableOpacity onPress={() => deleteIngredient(item.id)}>
                   <DeleteText>✕</DeleteText>
                 </TouchableOpacity>

@@ -9,6 +9,7 @@ export const theme = {
     subtle: "#777777",
     border: "#E5E5E5",
     danger: "#E63946",
+    placeholder: "#AAAAAA", // <--- adicionado
   },
   radius: {
     md: "10px",
