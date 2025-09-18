@@ -1,3 +1,5 @@
+import { Key } from "react";
+
 export type Ingredient = {
   id: number;
   name: string;
@@ -12,7 +14,7 @@ export type Lanche = {
   id: number;
   nome: string;
   ingredientes: string[];
-  valor:number;
+  valor: number;
 };
 
 // Pedido (input e retorno do backend)
@@ -21,10 +23,12 @@ export type PedidoInput = {
   note: string;
   restauranteId: number;
   lanches: {
+    id: Key | null | undefined;
+    valor: any;
     lancheId: number; // objeto, não mais lancheId
     ingredients: string[]; // nomes dos removidos
   }[];
-  valorTotal:number;
+  valorTotal: number;
 };
 
 export type Pedido = PedidoInput & {
@@ -32,6 +36,7 @@ export type Pedido = PedidoInput & {
   status: string;
   createdAt: string; // ISO string vinda do backend
   restauranteId: number;
+  data: string;
 };
 
 // Navegação
@@ -42,6 +47,7 @@ export type RootStackParamList = {
   Login: undefined;
   CadastroLanche: { comIngredientes: boolean };
   ProductLists: undefined;
+  Relatorios: undefined;
   Pedido: { lancheId: number }; // agora number
   PedidoCustom: {
     lancheId: number;

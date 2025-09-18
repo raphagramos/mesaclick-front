@@ -14,6 +14,7 @@ import RegisterScreen from "../screens/RegisterScreen";
 import { useAuth } from "../store/useAuth";
 import { RootStackParamList } from "../../types";
 import Header from "../components/Header";
+import RelatorioScreen from "../screens/RelatorioScreen";
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -64,6 +65,11 @@ export default function AppNavigator() {
               name="ConsultarPedidos"
               component={ConsultarPedidosScreen}
               options={{ header: () => <Header title="Consultar Pedidos" /> }}
+            />
+             <Stack.Screen
+              name="Relatorios"
+              component={RelatorioScreen}
+              options={{ header: () => <Header title="Relatórios" /> }}
             />
           </>
         ) : (
